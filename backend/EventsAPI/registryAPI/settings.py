@@ -29,6 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = [  '0.0.0.0', '127.0.0.1','52.176.53.158']
 
+AUTH_USER_MODEL = 'signup.User'
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -38,16 +40,27 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',                               
+    'rest_framework', 
+    'rest_framework.authtoken', 
+    'PIL',                             
     'signup',
     'corsheaders',
     'rest_auth',
+    'drf_yasg',
     'events',
     'register',
-    'ckeditor',
-    'ckeditor_uploader',
-    
+       
 ]
+
+SWAGGER_SETTINGS = {
+    'SECURITY_DEFINITIONS': {
+        'Bearer': {
+            'type': 'apiKey',
+            'name': 'Authorization',
+            'in': 'header'
+        }
+    }
+}
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -92,15 +105,20 @@ DATABASES = {
 }
 
 REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'NON_FIELD_ERRORS_KEY': 'error',
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.TokenAuthentication',
-    ),
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
 }
 
-REST_AUTH_SERIALIZERS = {     'USER_DETAILS_SERIALIZER':'users.serializers.CustomUserDetailsSerializer' }
+SIMPLE_JWT = {
+    #'ACCESS_TOKEN_LIFETIME': datetime.timedelta(minutes=10),
+    #'REFRESH_TOKEN_LIFETIME': datetime.timedelta(days=1),
+}
+
+REST_AUTH_SERIALIZERS = { 'USER_DETAILS_SERIALIZER':'users.serializers.CustomUserDetailsSerializer' }
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
 
@@ -140,28 +158,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 import os
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+MEDIA_URL = '/media/'
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-
-
-
-
-CKEDITOR_UPLOAD_PATH = "/home/media/media.lawrence.com/uploads"
-#CKEDITOR_UPLOAD_PREFIX = "http://media.lawrence.com/media/ckuploads/
-CKEDITOR_CONFIGS = {
-    'awesome_ckeditor': {
-        'toolbar': 'Basic',
-    },
-}
-
-
-CKEDITOR_CONFIGS = {
-    'default': {
-        'toolbar': 'Full',
-        'height': 300,
-        'width': 300,
-    },
-}
 
 CORS_ALLOWED_ORIGINS = [
 
@@ -177,3 +177,14 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+
+EMAIL_HOST_USER = 'sefakor1105@gmail.com'
+EMAIL_HOST_PASSWORD = 'avenja1105' # this is not the best though
+
+
+#EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
+#EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
